@@ -1,0 +1,17 @@
+{
+  "name": "kadence-public-api-examples",
+  "description": "This repository contains examples of how to use the Kadence Public API.",
+  "author": "Kadence <support@kadence.co>",
+  "version": "1.0.0",
+  "private": true,
+  "license": "ISC",
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wearekadence/kadence-public-api-examples.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wearekadence/kadence-public-api-examples/issues"
+  },
+  "homepage": "https://github.com/wearekadence/kadence-public-api-examples"
+}
