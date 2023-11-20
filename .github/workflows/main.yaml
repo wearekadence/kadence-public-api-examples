@@ -1,9 +1,16 @@
 name: Mirroring
 
-on: [push, delete]
+on:
+  push:
+    branches:
+      - main
+  delete:
+    branches:
+      - main
 
 jobs:
   to_public_repository:
+    if: github.repository == 'wearekadence/kadence-public-api-examples-internal'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
