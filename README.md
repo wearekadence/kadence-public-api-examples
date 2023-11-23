@@ -47,14 +47,14 @@ Before you can run the application, you'll need to set the following environment
 
 i.e. on Linux or macOS:
 ```shell
-export KADENCE_API_KEY=your-api-key
-export KADENCE_API_SECRET=your-api-secret
+export KADENCE_API_KEY_IDENTIFIER=your-api-key
+export KADENCE_API_KEY_SECRET=your-api-secret
 ```
 
 or on Windows:
 ```shell
-set KADENCE_API_KEY=your-api-key
-set KADENCE_API_SECRET=your-api-secret
+set KADENCE_API_KEY_IDENTIFIER=your-api-key
+set KADENCE_API_KEY_SECRET=your-api-secret
 ```
 
 To set up an API key and secret, you can consult the following help article: [How To Create an API Key?](https://help.kadence.co/kb/guide/en/how-to-create-an-api-key-Wzt5dE1Kbe/Steps/2372427)
