@@ -9,6 +9,42 @@
     <main role="main" class="container">
         <h1 class="mt-5">Kadence - Public API - Examples</h1>
         <p class="lead mt-3">This page showcases a selection of examples demonstrating the use of our public API. While not comprehensive, these examples serve as a starting point to inspire and guide you in integrating the API into your own tools and applications.</p>
+        <p class="lead" >A good starting point before starting use the API is our <a href="https://help.kadence.co/kb/guide/en/api-getting-started-developer-guide-yUYh7DBxBW/Steps/2372425" target="_blank">getting started guide</a> and our <a href="https://api.kadence.co" target="_blank">API specification</a>.</p>
+        <p class="lead">All examples in this project are deliberately light-weight with as much limited boilerplate as possible. All examples are commented with explanatory text where appropriate with links to the Kadence API documentation.</p>
+        <small>
+            Note: If you are building a web application you should make all API calls server-side with an abstraction layer so that you do
+            not expose the API key or give API access to the full API to all viewers of the webpage. For demonstration purposes we have made all
+            calls 'client-side' (via a proxy) to more easily demonstrate how to call and interact with the API. If you do this in production you will
+            give all visitors to your webpage full access to the Kadence API. This is not recommended.
+        </small>
+        <div class="container mt-5">
+            <div class="card-deck mb-3">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        <h4 class="my-0 font-weight-normal">List Bookings</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-3 text-center" style="min-width: 200px">
+                                <img src="images/list-bookings.png" width="200">
+                            </div>
+                            <div class="col-md-9">
+
+                                <p>One of the most basic things you can do with the Kadence API is to retrieve bookings information. In this example we will showcase:</p>
+                                <ul>
+                                    <li>Retrieving and listing bookings.</li>
+                                    <li>Retrieving information about buildings.</li>
+                                    <li>Retrieving users information.</li>
+                                </ul>
+                                <a href="/list-bookings">
+                                    <button type="button" class="btn btn-block btn-primary">Show me</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 </body>
 </html>
