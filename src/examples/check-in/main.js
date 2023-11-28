@@ -89,7 +89,7 @@ window.addEventListener('load', function () {
             `/v1/public/bookings/${bookingId}/check-in`,
             {
                 userId: userId,
-                method: 'doorAccess'
+                method: source
             }
         );
         return checkinResponse.data;
