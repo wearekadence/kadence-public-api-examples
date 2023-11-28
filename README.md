@@ -65,7 +65,7 @@ To start the application, run the following command:
 npm start
 ```
 
-You should now be able to access the application at [http://localhost:3000](http://localhost:3000) (or whatever port is next available sequentially).
+You should now be able to access the application at [http://localhost:3000](http://localhost:3000) from your web browser (or whatever port is next available sequentially).
 You'll see output in the terminal window that looks like this:
 
 ```shell
