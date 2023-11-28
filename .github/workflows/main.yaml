@@ -7,6 +7,7 @@ on:
   delete:
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   to_public_repository:
