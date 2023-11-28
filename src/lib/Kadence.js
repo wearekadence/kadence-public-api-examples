@@ -63,15 +63,50 @@ class Kadence {
             .join('&');
     }
 
+    async getBooking(id, params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/bookings/${id}?` + this.#toQueryString(params);
+
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
     async getBookings(params) {
         params = params || {};
 
         const bearerToken = await this.#getToken();
         const url = 'https://api.onkadence.co/v1/public/bookings?' + this.#toQueryString(params);
 
+        console.log(url);
+
         return await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async checkIn(id, params, data) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/bookings/${id}/check-in?` + this.#toQueryString(params);
+
+        console.log(url, data);
+
+        return await axios.post(url, data || {}, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`,
+                'Content-Type': 'application/ld+json'
             },
             validateStatus: () => true
         });
@@ -82,6 +117,8 @@ class Kadence {
 
         const bearerToken = await this.#getToken();
         const url = `https://api.onkadence.co/v1/public/users/${id}?` + this.#toQueryString(params);
+
+        console.log(url);
 
         return await axios.get(url, {
             headers: {
@@ -97,6 +134,24 @@ class Kadence {
         const bearerToken = await this.#getToken();
         const url = `https://api.onkadence.co/v1/public/users?` + this.#toQueryString(params);
 
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async getUserBookings(userId, params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/users/${userId}/bookings?` + this.#toQueryString(params);
+
+        console.log(url);
+
         return await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${bearerToken}`
@@ -111,6 +166,8 @@ class Kadence {
         const bearerToken = await this.#getToken();
         const url = `https://api.onkadence.co/v1/public/buildings/${id}?` + this.#toQueryString(params);
 
+        console.log(url);
+
         return await axios.get(url, {
             headers: {
                 Authorization: `Bearer ${bearerToken}`
@@ -124,6 +181,8 @@ class Kadence {
 
         const bearerToken = await this.#getToken();
         const url = `https://api.onkadence.co/v1/public/buildings?` + this.#toQueryString(params);
+
+        console.log(url);
 
         return await axios.get(url, {
             headers: {

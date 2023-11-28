@@ -20,6 +20,10 @@ if (!KADENCE_API_IDENTIFIER || !KADENCE_API_SECRET) {
     throw new Error('KADENCE_API_KEY_IDENTIFIER or KADENCE_API_KEY_SECRET is not set. Please set up it up in your environment variables. See https://help.kadence.co/kb/guide/en/how-to-create-an-api-key-Wzt5dE1Kbe/Steps/2372427 for creating an API key.');
 }
 
+// Set up the body parser to parse JSON and URL encoded data
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
+
 /**
  * Routes - Static Routes for Examples
  *
@@ -29,6 +33,7 @@ if (!KADENCE_API_IDENTIFIER || !KADENCE_API_SECRET) {
 
 app.use('/', express.static(path.join(__dirname, 'home')));
 app.use('/list-bookings', express.static(path.join(__dirname, 'examples/list-bookings')));
+app.use('/check-in', express.static(path.join(__dirname, 'examples/check-in')));
 
 /**
  * Routes - Public API Routes
@@ -37,14 +42,33 @@ app.use('/list-bookings', express.static(path.join(__dirname, 'examples/list-boo
  * how the public API works in the web page examples. In your own application, we recommend abstracting calls to the
  * Kadence API in a backend service that limits access to the API key and secret & full access to the API.
  */
+
 app.get('/v1/public/bookings', bodyParser.json(), async (req, res) => {
     const bookings = await kadence.getBookings(req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
     res.status(bookings.status);
     res.send(JSON.stringify(bookings.data));
 });
 
+app.get('/v1/public/bookings/:bookingId', async (req, res) => {
+    const bookingId = req.params.bookingId;
+    const user = await kadence.getBooking(bookingId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(user.status);
+    res.send(JSON.stringify(user.data));
+});
+
+app.post('/v1/public/bookings/:bookingId/check-in', async (req, res) => {
+    const bookingId = req.params.bookingId;
+    const checkIn = await kadence.checkIn(bookingId, req.query, req.body);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(checkIn.status);
+    res.send(JSON.stringify(checkIn.data));
+});
+
 app.get('/v1/public/users', async (req, res) => {
     const users = await kadence.getUsers(req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
     res.status(users.status);
     res.send(JSON.stringify(users.data));
 });
@@ -52,12 +76,22 @@ app.get('/v1/public/users', async (req, res) => {
 app.get('/v1/public/users/:userId', async (req, res) => {
     const userId = req.params.userId;
     const user = await kadence.getUser(userId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(user.status);
+    res.send(JSON.stringify(user.data));
+});
+
+app.get('/v1/public/users/:userId/bookings', async (req, res) => {
+    const userId = req.params.userId;
+    const user = await kadence.getUserBookings(userId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
     res.status(user.status);
     res.send(JSON.stringify(user.data));
 });
 
 app.get('/v1/public/buildings/', async (req, res) => {
     const buildings = await kadence.getBuildings(req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
     res.status(buildings.status);
     res.send(JSON.stringify(buildings.data));
 });
@@ -65,6 +99,7 @@ app.get('/v1/public/buildings/', async (req, res) => {
 app.get('/v1/public/buildings/:buildingId', async (req, res) => {
     const buildingId = req.params.buildingId;
     const building = await kadence.getBuilding(buildingId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
     res.status(building.status);
     res.send(JSON.stringify(building.data));
 });

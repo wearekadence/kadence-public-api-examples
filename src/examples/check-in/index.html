@@ -1,0 +1,47 @@
+<html>
+<head>
+    <title>Kadence - Public API - Examples - Check In To Bookings</title>
+    <link rel="icon" href="https://kadence.co/wp-content/uploads/2023/10/3xKlogo.png" sizes="32x32">
+    <link rel="icon" href="https://kadence.co/wp-content/uploads/2023/10/3xKlogo.png" sizes="192x192">
+
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js" integrity="sha512-b94Z6431JyXY14iSXwgzeZurHHRNkLt9d6bAHt7BZT38eqV+GyngIi/tVye4jBKPYQ2lBdRs0glww4fmpuLRwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Internal Libraries -->
+    <script src="./main.js" type="application/javascript"></script>
+</head>
+<body>
+<main role="main" class="container">
+    <h1 class="mt-5">Kadence - Public API - Examples - Check In To Bookings</h1>
+    <p class="lead mt-3">
+        This sample application demonstrates how to use the public API for automatically checking in users to bookings using their email address.
+        You can use the logic in this application as a basis to build your own check-in application that integrates with WiFi, door access or other systems.
+        In this example we check to see if a user has a booking today (desk or onsite) and if so, we check them in. If they have multiple bookings we check
+        them into all of them.
+    </p>
+    <p class="lead">This example can be found in <code>./src/examples/check-in</code>.</p>
+    <p class="lead">You can see more examples <a href="/">back</a> on the main screen.</p>
+    <div class="container mt-5">
+        <h4>Check In Form</h4>
+        <form id="checkInForm">
+            <div class="form-group">
+                <label for="emailAddress" class="mt-3">Enter the email address of the user you'd like to check in:</label>
+                <input type="email" class="form-control mt-3" id="emailAddress" placeholder="Enter email address">
+
+                <label for="checkInSource" class="mt-3">Select check-in source:</label>
+                <select class="form-select mt-3" id="checkInSource">
+                    <option value="doorAccess">Door Access</option>
+                    <option value="geofence">Geofence</option>
+                    <option value="sensor">Sensor</option>
+                    <option value="wifi">WiFi</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-4">Check in</button>
+        </form>
+    </div>
+</main>
+</body>
+</html>

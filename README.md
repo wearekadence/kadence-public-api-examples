@@ -8,10 +8,11 @@ The sample application(s) in this repository utilises the following technologies
 - [Express](https://expressjs.com/)
 - [Axios HTTP](https://axios-http.com/)
 - [Bootstrap](https://getbootstrap.com/)
+- [SweetAlert2](https://sweetalert2.github.io/)
 - [Highcharts](https://www.highcharts.com/)
 - [Tabulator](http://tabulator.info/)
 
-We've deliberatly kept the sample application(s) as simple as possible to make it easier to understand the code. That's
+We've deliberately kept the sample application(s) as simple as possible to make it easier to understand the code. That's
 why this is written in pure JavaScript and not utilising any frameworks like Angular, React or Vue. You shouldn't need
 to be an expert in any of these technologies to understand the code.
 

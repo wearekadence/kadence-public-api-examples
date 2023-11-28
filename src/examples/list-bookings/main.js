@@ -11,7 +11,7 @@
  *  2. API specification (https://api.kadence.co/)
  */
 
-(async function() {
+window.addEventListener('load', async function () {
 
     // These variables are used to cache responses from the Kadence API.
     const bookings = [];
@@ -307,4 +307,5 @@
         populateBuildingChart(),
         populateDeskBookingsTable()
     ]);
-})();
+
+});
