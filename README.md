@@ -9,6 +9,7 @@ The sample application(s) in this repository utilises the following technologies
 - [Axios HTTP](https://axios-http.com/)
 - [Bootstrap](https://getbootstrap.com/)
 - [SweetAlert2](https://sweetalert2.github.io/)
+- [Luxon](https://moment.github.io/luxon/)
 - [Highcharts](https://www.highcharts.com/)
 - [Tabulator](http://tabulator.info/)
 
