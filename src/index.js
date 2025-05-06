@@ -34,6 +34,7 @@ app.use(bodyParser.json());
 app.use('/', express.static(path.join(__dirname, 'home')));
 app.use('/list-bookings', express.static(path.join(__dirname, 'examples/list-bookings')));
 app.use('/check-in', express.static(path.join(__dirname, 'examples/check-in')));
+app.use('/floorplan', express.static(path.join(__dirname, 'examples/floorplan')));
 
 /**
  * Routes - Public API Routes
@@ -102,6 +103,51 @@ app.get('/v1/public/buildings/:buildingId', async (req, res) => {
     res.setHeader('Content-Type', 'application/ld+json');
     res.status(building.status);
     res.send(JSON.stringify(building.data));
+});
+
+app.get('/v1/public/floors/', async (req, res) => {
+    const floors = await kadence.getFloors(req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(floors.status);
+    res.send(JSON.stringify(floors.data));
+});
+
+app.get('/v1/public/floors/:floorId', async (req, res) => {
+    const floorId = req.params.floorId;
+    const floor = await kadence.getFloor(floorId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(floor.status);
+    res.send(JSON.stringify(floor.data));
+});
+
+app.get('/v1/public/neighborhoods/', async (req, res) => {
+    const neighborhoods = await kadence.getNeighborhoods(req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(neighborhoods.status);
+    res.send(JSON.stringify(neighborhoods.data));
+});
+
+app.get('/v1/public/neighborhoods/:neighborhoodId', async (req, res) => {
+    const neighborhoodId = req.params.neighborhoodId;
+    const neighborhood = await kadence.getNeighborhood(neighborhoodId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(neighborhood.status);
+    res.send(JSON.stringify(neighborhood.data));
+});
+
+app.get('/v1/public/spaces/', async (req, res) => {
+    const spaces = await kadence.getSpaces(req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(spaces.status);
+    res.send(JSON.stringify(spaces.data));
+});
+
+app.get('/v1/public/spaces/:spaceId', async (req, res) => {
+    const spaceId = req.params.spaceId;
+    const space = await kadence.getSpace(spaceId, req.query);
+    res.setHeader('Content-Type', 'application/ld+json');
+    res.status(space.status);
+    res.send(JSON.stringify(space.data));
 });
 
 /**

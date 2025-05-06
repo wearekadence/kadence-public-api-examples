@@ -1,0 +1,68 @@
+<html>
+<head>
+    <title>Kadence - Public API - Examples - Floorplan - Space Availability</title>
+    <link rel="icon" href="https://kadence.co/wp-content/uploads/2023/10/3xKlogo.png" sizes="32x32">
+    <link rel="icon" href="https://kadence.co/wp-content/uploads/2023/10/3xKlogo.png" sizes="192x192">
+    <link rel="stylesheet" href="./main.css">
+
+    <!-- External Libraries -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.0/dist/sweetalert2.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/1.6.2/axios.min.js" integrity="sha512-b94Z6431JyXY14iSXwgzeZurHHRNkLt9d6bAHt7BZT38eqV+GyngIi/tVye4jBKPYQ2lBdRs0glww4fmpuLRwA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/luxon/3.4.4/luxon.min.js"></script>
+
+    <!-- Internal Libraries -->
+    <script src="./main.js" type="application/javascript"></script>
+</head>
+<body>
+<main role="main" class="container">
+    <h1 class="mt-5">Kadence - Public API - Examples - Floorplan - Space Availability</h1>
+    <p class="lead mt-3">
+        This sample application shows how to use the public API to visualise real-time space availability on an
+        office floorplan. It pulls live booking and workspace data to indicate which spaces are currently
+        booked or free. You can use this approach to power kiosk displays, interactive maps, or admin dashboards.
+    </p>
+    <p class="lead">This example can be found in <code>./src/examples/floorplan</code>.</p>
+    <p class="lead">You can see more examples <a href="/">back</a> on the main screen.</p>
+
+    <div id="loadingSpinner" class="spinner-border text-primary mt-2" role="status">
+        <span class="sr-only"></span>
+    </div>
+
+    <div id="mainContentContainer" class="container mt-5">
+        <h4>Select Building and Floor</h4>
+
+        <!-- Building selector -->
+        <form id="buildingFloorSelectorForm" class="row">
+            <div class="form-group col">
+                <label for="building" class="mt-3">Building:</label>
+                <select class="form-select mt-3" id="building"></select>
+            </div>
+
+            <!-- Floor selector -->
+            <div class="form-group col">
+                <label for="floor" class="mt-3">Floor:</label>
+                <select class="form-select mt-3" id="floor"></select>
+            </div>
+        </form>
+
+        <!-- Floorplan container -->
+        <div class="floorplan-container-wrapper mt-5 mb-5">
+            <!-- Loading spinner -->
+            <div id="floorplanLoadingSpinner" class="spinner-border text-primary" role="status">
+                <span class="sr-only"></span>
+            </div>
+
+            <!-- Floorplan container -->
+            <div id="floorplanContainer" class="floorplan-container"></div>
+
+            <!-- No floorplan container -->
+            <div id="noFloorplanContainer" class="floorplan-container">
+                This floor has no floorplan.
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

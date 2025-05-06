@@ -191,6 +191,101 @@ class Kadence {
             validateStatus: () => true
         });
     }
-}
 
+    async getFloors(params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/floors?` + this.#toQueryString(params);
+
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async getFloor(id, params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/floors/${id}?` + this.#toQueryString(params);
+
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async getNeighborhoods(params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/neighborhoods?` + this.#toQueryString(params);
+
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async getNeighborhood(id, params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/neighborhoods/${id}?` + this.#toQueryString(params);
+        
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async getSpaces(params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/spaces?` + this.#toQueryString(params);
+
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+
+    async getSpace(id, params) {
+        params = params || {};
+
+        const bearerToken = await this.#getToken();
+        const url = `https://api.onkadence.co/v1/public/spaces/${id}?` + this.#toQueryString(params);
+
+        console.log(url);
+
+        return await axios.get(url, {
+            headers: {
+                Authorization: `Bearer ${bearerToken}`
+            },
+            validateStatus: () => true
+        });
+    }
+}
 module.exports = Kadence;

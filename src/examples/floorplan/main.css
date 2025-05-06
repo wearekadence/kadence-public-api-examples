@@ -1,0 +1,12 @@
+#mainContentContainer {
+    display: none;
+}
+
+#floorplanLoadingSpinner {
+    display: none;
+}
+
+.floorplan-container {
+    display: none;
+    width: 100%;
+}
