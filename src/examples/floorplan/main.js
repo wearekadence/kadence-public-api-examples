@@ -167,7 +167,7 @@ window.addEventListener('load', async function () {
         console.log('Populating floorplan: ', floor.name);
 
         // If there is no floorplan URL, hide the floorplan and show an error message
-        if (!floor || !floor.floorplanUrl) {
+        if (!floor || !floor.floorPlanUrl) {
             showHideFloorplan(false);
             return;
         }
@@ -177,7 +177,7 @@ window.addEventListener('load', async function () {
 
         // Hit the Kadence API, get the floorplan & booking information
         await Promise.all([
-            populateFloorplanSvg(floor.floorplanUrl),
+            populateFloorplanSvg(floor.floorPlanUrl),
             getBookingsForToday(floor.id)
         ])
         .then(([svgElement, bookings]) => {
@@ -211,9 +211,9 @@ window.addEventListener('load', async function () {
         })
     }
 
-    async function populateFloorplanSvg(floorplanUrl) {
+    async function populateFloorplanSvg(floorPlanUrl) {
         // Get the floorplan SVG and insert it into the floorplan container
-        const svg = (await axios.get(floorplanUrl)).data;
+        const svg = (await axios.get(floorPlanUrl)).data;
         const floorplanContainer = document.getElementById('floorplanContainer');
 
         floorplanContainer.innerHTML = svg;
