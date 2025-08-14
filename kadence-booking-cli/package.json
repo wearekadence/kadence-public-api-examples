@@ -1,0 +1,30 @@
+{
+  "name": "kadence-booking-cli",
+  "version": "1.0.0",
+  "description": "CLI to create Kadence bookings from a CSV file",
+  "bin": {
+    "kadence-booker": "index.js"
+  },
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js --help",
+    "lint": "echo 'no lint configured'",
+    "test": "node -e \"require('fs').accessSync('index.js')\""
+  },
+  "keywords": [
+    "kadence",
+    "cli",
+    "bookings",
+    "csv"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^1.11.0",
+    "commander": "^14.0.0",
+    "csv-parse": "^6.1.0",
+    "dotenv": "^17.2.1",
+    "moment-timezone": "^0.6.0"
+  }
+}
