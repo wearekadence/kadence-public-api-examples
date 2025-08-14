@@ -12,30 +12,53 @@ require('dotenv').config();
 
 const streamPipeline = promisify(pipeline);
 
-const DEFAULT_API_BASE_URL = process.env.KADENCE_API_BASE_URL || 'https://api.kadence.co/v1/public';
+const DEFAULT_API_BASE_URL = process.env.KADENCE_API_BASE_URL || 'https://api.onkadence.co/v1/public';
+const DEFAULT_LOGIN_BASE_URL = process.env.KADENCE_LOGIN_BASE_URL || 'https://login.onkadence.co';
 
 function createAxiosClient() {
-	const token = process.env.KADENCE_API_TOKEN;
+	const staticToken = process.env.KADENCE_API_TOKEN;
 	const keyId = process.env.KADENCE_API_KEY_IDENTIFIER;
 	const keySecret = process.env.KADENCE_API_KEY_SECRET;
 
-	const headers = {
-		Accept: 'application/json, application/ld+json',
-	};
-
-	const config = {
+	const client = axios.create({
 		baseURL: DEFAULT_API_BASE_URL,
-		headers,
+		headers: { Accept: 'application/json, application/ld+json' },
 		timeout: 30000,
-	};
+	});
 
-	if (token) {
-		config.headers.Authorization = `Bearer ${token}`;
-	} else if (keyId && keySecret) {
-		config.auth = { username: keyId, password: keySecret };
+	let cachedToken = null;
+	let tokenExpiresAtMs = 0;
+
+	async function getToken() {
+		if (staticToken) return staticToken;
+		if (!keyId || !keySecret) {
+			throw new Error('Missing Kadence credentials. Set KADENCE_API_TOKEN or KADENCE_API_KEY_IDENTIFIER and KADENCE_API_KEY_SECRET');
+		}
+		const now = Date.now();
+		if (cachedToken && now < tokenExpiresAtMs - 30000) {
+			return cachedToken;
+		}
+		const url = `${DEFAULT_LOGIN_BASE_URL}/oauth2/token`;
+		const resp = await axios.post(url, {
+			grant_type: 'client_credentials',
+			client_id: keyId,
+			client_secret: keySecret,
+			scope: 'public',
+		});
+		const { access_token, expires_in } = resp.data || {};
+		if (!access_token) {
+			throw new Error('Failed to obtain access token from Kadence.');
+		}
+		cachedToken = access_token;
+		tokenExpiresAtMs = now + (Number(expires_in || 3600) * 1000);
+		return cachedToken;
 	}
 
-	const client = axios.create(config);
+	client.interceptors.request.use(async (config) => {
+		config.headers = config.headers || {};
+		config.headers.Authorization = `Bearer ${await getToken()}`;
+		return config;
+	});
 
 	client.interceptors.response.use(
 		(resp) => resp,
@@ -236,9 +259,14 @@ async function processRow(client, row, options) {
 	const buildingName = row['building name'] || row.building || row['Building'] || row['Building Name'];
 	const floorName = row['floor name'] || row.floor || row['Floor'] || row['Floor Name'];
 	const deskName = row['desk name'] || row.desk || row['Desk'] || row['Desk Name'];
+	const dateInput = row['date'] || row['Date'] || row['booking date'] || row['Booking Date'];
 
-	if (!email || !buildingName || !floorName || !deskName) {
-		throw new Error('CSV row missing required columns (email address, building name, floor name, desk name)');
+	if (!email || !buildingName || !floorName || !deskName || !dateInput) {
+		throw new Error('CSV row missing required columns (email address, building name, floor name, desk name, date)');
+	}
+
+	if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateInput).trim())) {
+		throw new Error(`Invalid date format for row. Expected YYYY-MM-DD, got: ${dateInput}`);
 	}
 
 	const user = await findUserByEmail(client, email);
@@ -247,7 +275,7 @@ async function processRow(client, row, options) {
 	const desk = await findDeskByName(client, getEntityId(floor), deskName);
 
 	const buildingTz = await ensureBuildingTimezone(client, building);
-	const { startUtc, endUtc, date } = computeUtcRangeForDate(buildingTz, options.date);
+	const { startUtc, endUtc, date } = computeUtcRangeForDate(buildingTz, String(dateInput).trim());
 
 	if (options.dryRun) {
 		return {
@@ -289,8 +317,7 @@ async function run() {
 	program
 		.name('kadence-booker')
 		.description('Create desk bookings in Kadence from a CSV file')
-		.requiredOption('-f, --file <path>', 'Path to CSV file with columns: email address, building name, floor name, desk name')
-		.option('-d, --date <YYYY-MM-DD>', 'Booking date in building timezone (default: today in building timezone)')
+		.requiredOption('-f, --file <path>', 'Path to CSV file with columns: email address, building name, floor name, desk name, date (YYYY-MM-DD)')
 		.option('--dry-run', 'Resolve lookups and times but do not create bookings', false)
 		.option('--concurrency <n>', 'Number of rows to process concurrently', (v) => parseInt(v, 10), 1)
 		.option('--base-url <url>', 'Override Kadence API base URL', DEFAULT_API_BASE_URL)
@@ -332,7 +359,7 @@ async function run() {
 				break;
 			}
 			try {
-				const res = await processRow(client, row, { date: opts.date, dryRun: opts.dryRun });
+				const res = await processRow(client, row, { dryRun: opts.dryRun });
 				results.push({ row: rowIdx + 1, ok: true, res });
 				console.log(`${res.status === 'created' ? 'Created' : 'Dry-run'}: ${res.user} -> ${res.building} / ${res.floor} / ${res.desk} [${res.date} ${res.buildingTz}]`);
 			} catch (e) {

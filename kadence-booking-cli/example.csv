@@ -1,2 +1,3 @@
-email address,building name,floor name,desk name
-jane.doe@example.com,Headquarters,3rd Floor,Desk-3A
+email address,building name,floor name,desk name,date
+jane.doe@example.com,Headquarters,3rd Floor,Desk-3A,2025-08-15
+john.smith@example.com,Headquarters,2nd Floor,Desk-2C,2025-08-16
