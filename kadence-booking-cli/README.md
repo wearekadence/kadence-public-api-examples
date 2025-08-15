@@ -1,6 +1,6 @@
 # Kadence Booking CLI
 
-Create desk bookings in Kadence from a CSV file, using the Kadence Public API.
+Create space bookings in Kadence from a CSV file, using the Kadence Public API.
 
 ## Prerequisites
 
@@ -32,12 +32,15 @@ See `.env.example`.
 
 ## CSV format
 
-Required columns (case-insensitive aliases supported):
-- `email address`
-- `building name`
-- `floor name`
-- `desk name`
-- `date` (YYYY-MM-DD, in the building's local timezone)
+Headers (capitalisation required):
+- `Email Address`
+- `Building Name`
+- `Floor Name`
+- `Space Name`
+- `Space Type` (e.g., `desk`)
+- `Date` (YYYY-MM-DD)
+- `Start Time` (e.g., `9:00`) — defaults to `09:00` if empty
+- `End Time` (e.g., `17:00`) — defaults to `17:00` if empty
 
 Example: see `example.csv`.
 
@@ -48,9 +51,9 @@ Dry-run (no booking created):
 node index.js --file ./example.csv --dry-run
 ```
 
-Create bookings:
+Create bookings and log failures to a file:
 ```bash
-node index.js --file ./example.csv
+node index.js --file ./example.csv --log ./failures.csv
 ```
 
 Options:
@@ -58,18 +61,15 @@ Options:
 - `--dry-run`: resolve lookups and times but do not create bookings
 - `--concurrency <n>`: rows processed in parallel (default: 1)
 - `--base-url <url>`: override API base URL
+- `--log <path>`: path to CSV log of failures (default: `./kadence-booker-failures.log`)
 
 ## How it works
 
 For each CSV row, the CLI:
 1. Fetches an OAuth token using client credentials (unless a static bearer is provided).
 2. Looks up the user by email.
-3. Finds the building, floor, and desk by name.
+3. Finds the building, floor, and space by name (optionally matching `Space Type`).
 4. Resolves the building's timezone (fallback to fetching building details if needed).
-5. Creates a booking from 09:00 to 17:00 local time on the given date.
+5. Creates a booking from the specified start/end times (defaulting to 09:00–17:00) on the given date.
 
-## Notes
-
-- Endpoints used: `/buildings`, `/floors`, `/spaces`, `/users`, `/bookings` at `https://api.onkadence.co/v1/public`.
-- Time conversion uses the building timezone; sends UTC ISO timestamps.
-- Error messages include HTTP status + API details for easier debugging.
+Failures are appended to the specified `--log` file with row number, input data and error message.

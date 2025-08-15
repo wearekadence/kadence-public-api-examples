@@ -1,3 +1,2 @@
-email address,building name,floor name,desk name,date
-jane.doe@example.com,Headquarters,3rd Floor,Desk-3A,2025-08-15
-john.smith@example.com,Headquarters,2nd Floor,Desk-2C,2025-08-16
+Email Address,Building Name,Floor Name,Space Name,Space Type,Date,Start Time,End Time
+mark@kadence.co,Urban HQ,Floor5,Desk 5,desk,2025-08-15,9:00,16:00

@@ -168,12 +168,19 @@ async function findSpacesForFloor(client, floorId) {
 	}
 }
 
-async function findDeskByName(client, floorId, deskName) {
+async function findSpaceByName(client, floorId, spaceName, spaceType) {
 	const spaces = await findSpacesForFloor(client, floorId);
-	const nameNorm = normalizeString(deskName);
-	const found = spaces.find((s) => normalizeString(s.name) === nameNorm || normalizeString(s.displayName) === nameNorm);
-	if (!found) throw new Error(`Desk/space not found: ${deskName} (floor ${floorId})`);
-	return found;
+	const nameNorm = normalizeString(spaceName);
+	const typeNorm = normalizeString(spaceType || '');
+	const candidate = spaces.find((s) => {
+		const sName = normalizeString(s.name) === nameNorm || normalizeString(s.displayName) === nameNorm;
+		if (!sName) return false;
+		if (!typeNorm) return true;
+		const sType = normalizeString(s.type || s.spaceType || s.kind || s.category);
+		return sType ? sType === typeNorm : true;
+	});
+	if (!candidate) throw new Error(`Space not found: ${spaceName}${typeNorm ? ` (type ${spaceType})` : ''} (floor ${floorId})`);
+	return candidate;
 }
 
 async function findUserByEmail(client, email) {
@@ -225,6 +232,20 @@ function computeUtcRangeForDate(buildingTz, dateStr) {
 	return { startUtc: startLocal.utc().toISOString(), endUtc: endLocal.utc().toISOString(), date };
 }
 
+function isValidTimeString(value) {
+	const str = String(value || '').trim();
+	return /^\d{1,2}:\d{2}$/.test(str);
+}
+
+function computeUtcRangeForDateAndTimes(buildingTz, dateStr, startTimeStr, endTimeStr) {
+	const date = String(dateStr).trim();
+	const startStr = isValidTimeString(startTimeStr) ? String(startTimeStr).trim() : '09:00';
+	const endStr = isValidTimeString(endTimeStr) ? String(endTimeStr).trim() : '17:00';
+	const startLocal = moment.tz(`${date} ${startStr}`, 'YYYY-MM-DD H:mm', buildingTz);
+	const endLocal = moment.tz(`${date} ${endStr}`, 'YYYY-MM-DD H:mm', buildingTz);
+	return { startUtc: startLocal.utc().toISOString(), endUtc: endLocal.utc().toISOString(), date };
+}
+
 async function createBooking(client, payload) {
 	// Prefer minimal fields to reduce mismatch risk
 	const bodyCandidates = [
@@ -255,14 +276,18 @@ async function createBooking(client, payload) {
 }
 
 async function processRow(client, row, options) {
-	const email = row['email address'] || row.email || row['Email'] || row['Email Address'];
-	const buildingName = row['building name'] || row.building || row['Building'] || row['Building Name'];
-	const floorName = row['floor name'] || row.floor || row['Floor'] || row['Floor Name'];
-	const deskName = row['desk name'] || row.desk || row['Desk'] || row['Desk Name'];
-	const dateInput = row['date'] || row['Date'] || row['booking date'] || row['Booking Date'];
+	// Exact header names as requested
+	const email = row['Email Address'];
+	const buildingName = row['Building Name'];
+	const floorName = row['Floor Name'];
+	const spaceName = row['Space Name'];
+	const spaceType = row['Space Type'];
+	const dateInput = row['Date'];
+	const startTimeInput = row['Start Time'];
+	const endTimeInput = row['End Time'];
 
-	if (!email || !buildingName || !floorName || !deskName || !dateInput) {
-		throw new Error('CSV row missing required columns (email address, building name, floor name, desk name, date)');
+	if (!email || !buildingName || !floorName || !spaceName || !spaceType || !dateInput) {
+		throw new Error('CSV row missing required columns (Email Address, Building Name, Floor Name, Space Name, Space Type, Date)');
 	}
 
 	if (!/^\d{4}-\d{2}-\d{2}$/.test(String(dateInput).trim())) {
@@ -272,10 +297,15 @@ async function processRow(client, row, options) {
 	const user = await findUserByEmail(client, email);
 	const building = await findBuildingByName(client, buildingName);
 	const floor = await findFloorByName(client, getEntityId(building), floorName);
-	const desk = await findDeskByName(client, getEntityId(floor), deskName);
+	const space = await findSpaceByName(client, getEntityId(floor), spaceName, spaceType);
 
 	const buildingTz = await ensureBuildingTimezone(client, building);
-	const { startUtc, endUtc, date } = computeUtcRangeForDate(buildingTz, String(dateInput).trim());
+	const { startUtc, endUtc, date } = computeUtcRangeForDateAndTimes(
+		buildingTz,
+		String(dateInput).trim(),
+		startTimeInput,
+		endTimeInput
+	);
 
 	if (options.dryRun) {
 		return {
@@ -283,7 +313,8 @@ async function processRow(client, row, options) {
 			user: user.email || user.primaryEmail || email,
 			building: building.name,
 			floor: floor.name,
-			desk: desk.name || desk.displayName,
+			space: space.name || space.displayName,
+			spaceType: spaceType,
 			startUtc,
 			endUtc,
 			buildingTz,
@@ -293,7 +324,7 @@ async function processRow(client, row, options) {
 
 	const booking = await createBooking(client, {
 		userId: getEntityId(user),
-		spaceId: getEntityId(desk),
+		spaceId: getEntityId(space),
 		startUtc,
 		endUtc,
 	});
@@ -304,7 +335,8 @@ async function processRow(client, row, options) {
 		user: user.email || user.primaryEmail || email,
 		building: building.name,
 		floor: floor.name,
-		desk: desk.name || desk.displayName,
+		space: space.name || space.displayName,
+		spaceType: spaceType,
 		startUtc,
 		endUtc,
 		buildingTz,
@@ -316,11 +348,12 @@ async function run() {
 	const program = new Command();
 	program
 		.name('kadence-booker')
-		.description('Create desk bookings in Kadence from a CSV file')
-		.requiredOption('-f, --file <path>', 'Path to CSV file with columns: email address, building name, floor name, desk name, date (YYYY-MM-DD)')
+		.description('Create space bookings in Kadence from a CSV file')
+		.requiredOption('-f, --file <path>', 'Path to CSV file with headers: Email Address, Building Name, Floor Name, Space Name, Space Type, Date, Start Time, End Time')
 		.option('--dry-run', 'Resolve lookups and times but do not create bookings', false)
 		.option('--concurrency <n>', 'Number of rows to process concurrently', (v) => parseInt(v, 10), 1)
 		.option('--base-url <url>', 'Override Kadence API base URL', DEFAULT_API_BASE_URL)
+		.option('--log <path>', 'Path to failure log file (CSV)', path.join(process.cwd(), 'kadence-booker-failures.log'))
 		.parse(process.argv);
 
 	const opts = program.opts();
@@ -334,6 +367,43 @@ async function run() {
 	const client = createAxiosClient();
 	if (opts.baseUrl && opts.baseUrl !== DEFAULT_API_BASE_URL) {
 		client.defaults.baseURL = opts.baseUrl;
+	}
+
+	const logPath = path.isAbsolute(opts.log) ? opts.log : path.join(process.cwd(), opts.log);
+	let logInitialized = false;
+	function appendFailureLog(rowIndex, row, errorMessage) {
+		try {
+			if (!logInitialized) {
+				const header = 'Row,Email Address,Building Name,Floor Name,Space Name,Space Type,Date,Start Time,End Time,Error\n';
+				if (!fs.existsSync(logPath)) {
+					fs.writeFileSync(logPath, header, 'utf8');
+				} else {
+					const existing = fs.readFileSync(logPath, 'utf8');
+					if (!existing.startsWith('Row,Email Address')) {
+						fs.writeFileSync(logPath, header + existing, 'utf8');
+					}
+				}
+				logInitialized = true;
+			}
+			const safe = (v) => String(v == null ? '' : v).replaceAll('"', '""');
+			const line = [
+				rowIndex,
+				row['Email Address'],
+				row['Building Name'],
+				row['Floor Name'],
+				row['Space Name'],
+				row['Space Type'],
+				row['Date'],
+				row['Start Time'] || '09:00',
+				row['End Time'] || '17:00',
+				errorMessage,
+			]
+				.map((v) => `"${safe(v)}"`)
+				.join(',') + '\n';
+			fs.appendFileSync(logPath, line, 'utf8');
+		} catch (e) {
+			console.error(`Failed to write failure log: ${e.message}`);
+		}
 	}
 
 	const rows = await readCsv(filePath);
@@ -361,10 +431,12 @@ async function run() {
 			try {
 				const res = await processRow(client, row, { dryRun: opts.dryRun });
 				results.push({ row: rowIdx + 1, ok: true, res });
-				console.log(`${res.status === 'created' ? 'Created' : 'Dry-run'}: ${res.user} -> ${res.building} / ${res.floor} / ${res.desk} [${res.date} ${res.buildingTz}]`);
+				const label = res.space || res.desk;
+				console.log(`${res.status === 'created' ? 'Created' : 'Dry-run'}: ${res.user} -> ${res.building} / ${res.floor} / ${label} [${res.date} ${res.buildingTz}]`);
 			} catch (e) {
 				results.push({ row: rowIdx + 1, ok: false, error: e.message });
 				console.error(`Row ${rowIdx + 1} failed: ${e.message}`);
+				appendFailureLog(rowIdx + 1, row, e.message);
 			}
 		}
 	}
