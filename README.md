@@ -53,11 +53,19 @@ export KADENCE_API_KEY_IDENTIFIER=your-api-key
 export KADENCE_API_KEY_SECRET=your-api-secret
 ```
 
-or on Windows:
-```shell
+on Windows (Command Prompt / `cmd.exe`):
+```bat
 set KADENCE_API_KEY_IDENTIFIER=your-api-key
 set KADENCE_API_KEY_SECRET=your-api-secret
 ```
+
+or on Windows (PowerShell):
+```powershell
+$env:KADENCE_API_KEY_IDENTIFIER="your-api-key"
+$env:KADENCE_API_KEY_SECRET="your-api-secret"
+```
+
+> **Note:** These commands set the variables for the current terminal session only, so run `npm start` in the **same** window afterwards. The `cmd.exe` `set` syntax does **not** work in a PowerShell window — PowerShell needs the `$env:` form shown above. Using the wrong one for your shell is a common cause of the `KADENCE_API_KEY_IDENTIFIER or KADENCE_API_KEY_SECRET is not set` error. Windows Terminal and VS Code default to PowerShell, so if you're unsure, use the PowerShell commands.
 
 To set up an API key and secret, you can consult the following help article: [How To Create an API Key?](https://help.kadence.co/kb/guide/en/how-to-create-an-api-key-Wzt5dE1Kbe/Steps/2372427)
 
